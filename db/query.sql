@@ -20,19 +20,28 @@ const viewAllEmployees = () => {
 };
 
 const addEmployee = (first_name, last_name, role_id, manager_id) => {
-  return connection.promise().query(('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [first_name, last_name, role_id, manager_id]);)
+  return connection.promise().query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [first_name, last_name, role_id, manager_id]);
 };
 
 const addDepartment = (name) => {
-  return connection.promise().query('INSERT INTO department (name) VALUES (?)', [name])
+  return connection.promise().query('INSERT INTO department (name) VALUES (?)', [name]);
 };
 
 const addRole = (title, id, department_id, salary) => {
-  return connection.promise().query()
+  return connection.promise().query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?, ?)', [title, salary, department_id]);
 };
 
-const updateEmployee = (employee_id, role_id) => {
-  return connection.promise().query()
+const updateEmployeeRole = (employee_id, role_id) => {
+  return connection.promise().query('UPDATE employee SET role_id = ? WHERE id = ?', [role_id, employee_id]);
 };
 
 
+module.exports = {
+  viewAllDepartments,
+  viewAllRoles,
+  viewAllEmployees,
+  addDepartment,
+  addRole,
+  addEmployee,
+  updateEmployeeRole,
+};
