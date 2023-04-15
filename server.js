@@ -16,6 +16,177 @@
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
+const inquirer = require('inquirer');
+const fs = require('fs')
+// const query = require('./db/query');
+// const query = require('/db/query');
+
+// Function to prompt user for input and call the appropriate query
+async function main() {
+  const { action } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'action',
+      message: 'What would you like to do?',
+      choices: [
+        'View all departments',
+        'View all roles',
+        'View all employees',
+        'Add a department',
+        'Add a role',
+        'Add an employee',
+        'Update an employee role',
+        'Exit',
+      ],
+    },
+  ]);
+
+
+  const viewAllDepartments = () => {
+    return connection.promise().query('SELECT * FROM department');
+  };
+  
+  const viewAllRoles = () => {
+    return connection.promise().query('SELECT * FROM role');
+  };
+  
+  const viewAllEmployees = () => {
+    return connection.promise().query('SELECT * FROM employee');
+  };
+  
+  const addEmployee = (first_name, last_name, role_id, manager_id) => {
+    return connection.promise().query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [first_name, last_name, role_id, manager_id]);
+  };
+  
+  const addDepartment = (name) => {
+    return connection.promise().query('INSERT INTO department (name) VALUES (?)', [name]);
+  };
+  
+  const addRole = (title, id, department_id, salary) => {
+    return connection.promise().query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?, ?)', [title, salary, department_id]);
+  };
+  
+  const updateEmployeeRole = (employee_id, role_id) => {
+    return connection.promise().query('UPDATE employee SET role_id = ? WHERE id = ?', [role_id, employee_id]);
+  };
+  
+
+
+
+  switch (action) {
+    case 'View all departments':
+      const departments = await viewAllDepartments();
+      console.table(departments[0]);
+      break;
+    case 'View all roles':
+      const roles = await query.viewAllRoles();
+      console.table(roles[0]);
+      break;
+    case 'View all employees':
+      const employees = await query.viewAllEmployees();
+      console.table(employees[0]);
+      break;
+    case 'Add a department':
+      const { departmentName } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'departmentName',
+          message: 'Enter the department name:',
+        },
+      ]);
+      await query.addDepartment(departmentName);
+      console.log('Department added successfully!');
+      break;
+    case 'Add a role':
+      // You can use the departments data for selection
+      const { title, salary, department_id } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'title',
+          message: 'Enter the role title:',
+        },
+        {
+          type: 'number',
+          name: 'salary',
+          message: 'Enter the role salary:',
+        },
+        {
+          type: 'number',
+          name: 'department_id',
+          message: 'Enter the department ID for the role:',
+        },
+      ]);
+      await query.addRole(title, salary, department_id);
+      console.log('Role added successfully!');
+      break;
+    case 'Add an employee':
+      // You can use the roles data for role selection and employees data for manager selection
+      const { first_name, last_name, role_id, manager_id } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'first_name',
+          message: 'Enter the employee\'s first name:',
+        },
+        {
+          type: 'input',
+          name: 'last_name',
+          message: 'Enter the employee\'s last name:',
+        },
+        {
+          type: 'number',
+          name: 'role_id',
+          message: 'Enter the role ID for the employee:',
+        },
+        {
+          type: 'number',
+          name: 'manager_id',
+          message: 'Enter the manager ID for the employee (leave empty if no manager):',
+        },
+      ]);
+      await query.addEmployee(first_name, last_name, role_id, manager_id || null);
+      console.log('Employee added successfully!');
+      break;
+    case 'Update an employee role':
+      // You can use the employees data for employee selection and roles data for role selection
+      const { employee_id, new_role_id } = await inquirer.prompt([
+        {
+          type: 'number',
+          name: 'employee_id',
+          message: 'Enter the employee ID to update:',
+        },
+        {
+          type: 'number',
+          name: 'new_role_id',
+          message: 'Enter the new role ID for the employee:',
+        },
+      ]);
+      await query.updateEmployeeRole(employee_id, new_role_id);
+      console.log('Employee role updated successfully!');
+      break;
+    case 'Exit':
+      process.exit(0);
+  }
+
+  const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    DATABASE: 'employee_tracker',
+});
+
+
+
+
+
+
+  // Call the main function again to keep asking for input until the user exits
+  main();
+}
+
+// Call the main function to start the application
+main();
+
+     
 
 
 

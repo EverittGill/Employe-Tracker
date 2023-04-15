@@ -1,4 +1,4 @@
-const mysql = require('msyql12');
+-- const mysql = require('msyql2');
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -45,3 +45,4 @@ module.exports = {
   addEmployee,
   updateEmployeeRole,
 };
+
