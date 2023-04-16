@@ -17,11 +17,24 @@
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
 const inquirer = require('inquirer');
-const fs = require('fs')
+const mysql = require('mysql2')
+// const fs = require('fs')
 // const query = require('./db/query');
 // const query = require('/db/query');
 
 // Function to prompt user for input and call the appropriate query
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'employee_tracker',
+});
+
+
+
+
+
 async function main() {
   const { action } = await inquirer.prompt([
     {
@@ -62,8 +75,8 @@ async function main() {
     return connection.promise().query('INSERT INTO department (name) VALUES (?)', [name]);
   };
   
-  const addRole = (title, id, department_id, salary) => {
-    return connection.promise().query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?, ?)', [title, salary, department_id]);
+  const addRole = (title, department_id, salary) => {
+    return connection.promise().query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, department_id]);
   };
   
   const updateEmployeeRole = (employee_id, role_id) => {
@@ -77,14 +90,17 @@ async function main() {
     case 'View all departments':
       const departments = await viewAllDepartments();
       console.table(departments[0]);
+      main()
       break;
     case 'View all roles':
-      const roles = await query.viewAllRoles();
+      const roles = await viewAllRoles();
       console.table(roles[0]);
+      main()
       break;
     case 'View all employees':
-      const employees = await query.viewAllEmployees();
+      const employees = await viewAllEmployees();
       console.table(employees[0]);
+      main()
       break;
     case 'Add a department':
       const { departmentName } = await inquirer.prompt([
@@ -94,11 +110,11 @@ async function main() {
           message: 'Enter the department name:',
         },
       ]);
-      await query.addDepartment(departmentName);
+      await addDepartment(departmentName);
       console.log('Department added successfully!');
+      main()
       break;
     case 'Add a role':
-      // You can use the departments data for selection
       const { title, salary, department_id } = await inquirer.prompt([
         {
           type: 'input',
@@ -116,11 +132,11 @@ async function main() {
           message: 'Enter the department ID for the role:',
         },
       ]);
-      await query.addRole(title, salary, department_id);
+      await addRole(title, salary, department_id);
       console.log('Role added successfully!');
+      main()
       break;
     case 'Add an employee':
-      // You can use the roles data for role selection and employees data for manager selection
       const { first_name, last_name, role_id, manager_id } = await inquirer.prompt([
         {
           type: 'input',
@@ -143,11 +159,11 @@ async function main() {
           message: 'Enter the manager ID for the employee (leave empty if no manager):',
         },
       ]);
-      await query.addEmployee(first_name, last_name, role_id, manager_id || null);
+      await addEmployee(first_name, last_name, role_id, manager_id || null);
       console.log('Employee added successfully!');
+      main()
       break;
     case 'Update an employee role':
-      // You can use the employees data for employee selection and roles data for role selection
       const { employee_id, new_role_id } = await inquirer.prompt([
         {
           type: 'number',
@@ -160,19 +176,15 @@ async function main() {
           message: 'Enter the new role ID for the employee:',
         },
       ]);
-      await query.updateEmployeeRole(employee_id, new_role_id);
+      await updateEmployeeRole(employee_id, new_role_id);
       console.log('Employee role updated successfully!');
+      main()
       break;
     case 'Exit':
       process.exit(0);
   }
 
-  const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    DATABASE: 'employee_tracker',
-});
+  
 
 
 
@@ -180,7 +192,7 @@ async function main() {
 
 
   // Call the main function again to keep asking for input until the user exits
-  main();
+  // main();
 }
 
 // Call the main function to start the application
