@@ -1,8 +1,8 @@
-
+// require the things that are required
 const inquirer = require('inquirer');
 const mysql = require('mysql2')
 
-
+// create the connection
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -13,7 +13,10 @@ const connection = mysql.createConnection({
 
 
 
-
+// here's the function. I learned from my tutor that it's a bad practice to have it all in the same function
+// so I'll try to refactor it when I have more time. For now, here it is.
+// this first part is creating all the options when you start the program.
+// action is whatever the user selected and it gets used again in the switch case below.
 async function main() {
   const { action } = await inquirer.prompt([
     {
@@ -33,7 +36,7 @@ async function main() {
     },
   ]);
 
-
+// below are all the functions needed to preform the actions required from the choice you make. there's one per choice.
   const viewAllDepartments = () => {
     return connection.promise().query('SELECT * FROM department');
   };
@@ -64,8 +67,11 @@ async function main() {
   
 
 
-
-  switch (action) {
+// I used a switch case to determine what choice was made and call the functions as needed.
+// At the end of each case it calls the main function again so you always have another choice to make if desired  // 
+// these first three were easy but it took a fair bit to get the rest of the functions to work properly.
+// it uses console.table as required.
+switch (action) {
     case 'View all departments':
       const departments = await viewAllDepartments();
       console.table(departments[0]);
@@ -170,7 +176,7 @@ async function main() {
   break;
 
     
-
+// this case was the most annoying. 
     case 'Update an employee role':
   const updateRoleChoices = await viewAllRoles();
   const updateRoleList = updateRoleChoices[0].map((role) => ({
@@ -221,7 +227,7 @@ async function main() {
 
 }
 
-
+// call the function so it defaults to running upon start
 main();
 
      
